@@ -9,6 +9,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -26,8 +27,10 @@ class Base
         $oldErrorReporting = error_reporting();
         error_reporting($oldErrorReporting & ~E_DEPRECATED);
 
-        $serializer = new \Symfony\Component\Serializer\Serializer([new CustomNormalizer()], [new \Symfony\Component\Serializer\Encoder\JsonEncoder()]);
-        $ret = $serializer->normalize($this);
+        $serializer = new \Symfony\Component\Serializer\Serializer([new ObjectNormalizer()], [new \Symfony\Component\Serializer\Encoder\JsonEncoder()]);
+
+        $ret = $serializer->normalize($this, null, [AbstractObjectNormalizer::SKIP_NULL_VALUES => true]);
+
         error_reporting($oldErrorReporting);
         return $ret;
     }
